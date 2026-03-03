@@ -1,0 +1,58 @@
+.task-details {
+  padding: 8px 0 10px;
+
+  &__header {
+    margin-bottom: 0;
+    padding: 0 14px 8px;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 22px;
+      color: #3f3f46;
+    }
+
+    svg {
+      width: 13px;
+      height: 13px;
+
+      path {
+        fill: #9ca3af;
+      }
+    }
+  }
+
+  .table-wrap {
+    padding: 0 6px;
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+
+      th,
+      td {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 8px 10px;
+        white-space: nowrap;
+      }
+
+      thead th {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: none;
+        font-weight: 500;
+      }
+
+      tbody td {
+        color: #374151;
+      }
+    }
+  }
+}

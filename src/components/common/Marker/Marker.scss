@@ -1,0 +1,152 @@
+@import "../../../assets/styles/mixins";
+
+.marker {
+  margin-left: -20px;
+  margin-top: -40px;
+}
+
+.circle-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: var(--color-primary);
+  background: var(--color-primary);
+  border: 1px solid var(--color-white);
+  box-sizing: border-box;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
+  transition: .3s;
+  font-family: "SomarMedium", sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  box-shadow: -1px 0px 2px 0px rgba(3, 3, 3, 0.1), 1px 2px 2px 0px rgba(0, 0, 0, 0.15);
+
+  .marker-counter{
+    color: var(--color-white);
+    font-family: SomarBold, sans-serif;
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+
+  .marker-popup {
+    background-color: var(--color-white);
+    color: var(--color-black-light);
+    font-size: 12px;
+    border: 1px solid var(--color-grey-30);
+    box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.15), -1px 0px 2px rgba(3, 3, 3, 0.1);
+    border-radius: 8px;
+    display: none;
+    position: absolute;
+    padding: 16px;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    min-width: 160px;
+    z-index: 10000;
+    max-height: max(400px, 60vh);
+    overflow: auto;
+    @include scrollbar(false, "&");
+
+    .marker-popup-info{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      h5{
+        font-family: 'SomarMedium', sans-serif;
+        font-size: 12px;
+        line-height: 16px;
+        border-radius: 8px;
+        padding: 24px 9px;
+        border: 1px solid var(--color-grey-30);
+      }
+      h3{
+        font-family: 'SomarMedium', sans-serif;
+        font-size: 24px;
+        line-height: 32px;
+      }
+      p{
+        font-family: 'SomarRegular', sans-serif;
+        font-size: 14px;
+        line-height: 16px;
+        color: var(--color-grey-70);
+      }
+    }
+
+    .marker-popup-details {
+      display: flex;
+      gap: 15px;
+      flex-direction: column;
+      padding: 20px 5px;
+
+      &-item {
+        display: flex;
+        gap: 160px;
+        align-items: center;
+        justify-content: space-between;
+        span:first-child {
+          color: var(--color-grey-70);
+        }
+      }
+    }
+  }
+
+  &.color-0 {
+    background-color: var(--color-additional-3);
+  }
+  &.color-1 {
+    background-color: var(--color-ongoing);
+  }
+  &.color-2 {
+    background-color: var(--color-primary);
+  }
+
+  &:hover {
+    cursor: pointer;
+    .marker-popup {
+      display: block;
+      //overflow: hidden;
+    }
+  }
+}
+
+.cluster-marker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 2px;
+  box-sizing: content-box;
+  width: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--color-white);
+  background-color: var(--color-additional-2);
+  color: var(--color-white);
+  box-shadow: -1px 0px 2px 0px #6026501A, 1px 2px 2px 0px #00000026;
+
+  &.multimarker {
+    background-color: var(--color-black-light);
+    .marker-popup {
+      max-height: 300px;
+      overflow: auto;
+      @include scrollbar(false, "&");
+    }
+    .multimarker-popup-item {
+      &:not(:last-of-type){
+        margin-bottom: 5px;
+      }
+      &.hasAction {
+        cursor: pointer;
+        &:hover{
+          opacity: .7;
+        }
+      }
+    }
+  }
+}

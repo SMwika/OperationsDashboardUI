@@ -1,0 +1,61 @@
+.average-time {
+  padding: 10px 12px 8px;
+
+  &__header {
+    margin-bottom: 6px;
+    align-items: center;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    h4 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 30px;
+      color: #3f3f46;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+
+      path {
+        fill: #9ca3af;
+      }
+    }
+  }
+
+  &__tabs {
+    display: inline-flex;
+    border: 1px solid var(--color-grey-20);
+    border-radius: 8px;
+    overflow: hidden;
+
+    button {
+      border: 0;
+      background: #eef2f7;
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1;
+      padding: 8px 12px;
+      cursor: pointer;
+
+      &.active {
+        background: #1f8682;
+        color: #fff;
+      }
+    }
+  }
+
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: #d9dee7;
+  }
+
+  .recharts-cartesian-axis-tick-value {
+    fill: #4b5563;
+  }
+}

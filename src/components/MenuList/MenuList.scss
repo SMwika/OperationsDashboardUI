@@ -1,0 +1,148 @@
+.menu-list {
+  width: 100%;
+
+  img.icon, svg {
+    margin: 0 16px 0 0;
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    color: var(--color-tahakom);
+    path{
+      fill: var(--color-black-light)
+    }
+  }
+
+  .links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-top: 16px;
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: var(--color-black-light);
+    font-size: 14px;
+    line-height: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 8px 16px;
+
+    .link-name{
+      font-family: 'SomarMedium', sans-serif;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 4px 0;
+    }
+
+    &.has-separator {
+      padding-bottom: 24px;
+      border-bottom: 1px solid lightgrey;
+    }
+
+    &.active {
+      color: var(--color-tahakom);
+      background-color: var(--color-highlight-1);
+      path{
+        fill: var(--color-tahakom);
+      }
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: var(--color-tahakom);
+      text-decoration: none;
+      path{
+        fill: var(--color-tahakom);
+      }
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .menu-item-has-children {
+    position: relative;
+    img {
+      &:last-child {
+        position: absolute;
+        right: 22px;
+        // top: 5px;
+      }
+    }
+  }
+
+  .subLinks {
+    position: relative;
+
+    .link.subLink {
+      background-color: transparent;
+      color: var(--color-black-light);
+      padding-left: 47px;
+      position: relative;
+    }
+
+    .link.subLink:hover,
+    .link.subLink.active {
+      color: var(--color-tahakom);
+      background-color: var(--color-highlight-1);
+    }
+    .link.subLink:hover {
+      background-color: transparent;
+      color: var(--color-tahakom);
+    }
+    .link.subLink.active:hover {
+      background-color: var(--color-highlight-1);
+      color: var(--color-tahakom);
+    }
+    .link.subLink:hover::before,
+    .link.subLink.active::before {
+      width: 1px;
+      background-color: #612551;
+    }
+  }
+}
+
+.navHide {
+  .menu-item-has-children {
+    &.active{
+      color: var(--color-tahakom);
+      background-color: var(--color-highlight-1);
+      path{
+        fill: var(--color-tahakom);
+      }
+      &:hover {
+        cursor: default;
+      }
+    }
+    img {
+      &:last-child {
+        display: none;
+      }
+    }
+  }
+
+}
+.menu-list-popup{
+  .MuiList-padding, .MuiMenuItem-root{
+    padding: 0;
+  }
+  .link{
+    width: 100%;
+    border-radius: 0;
+  }
+}

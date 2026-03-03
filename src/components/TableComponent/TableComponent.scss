@@ -1,0 +1,155 @@
+@use "../../assets/styles/mixins.scss" as *;
+
+.table{
+  padding: 10px;
+  @include scrollbar(true, "&");
+  &:hover{
+    @include scrollbar(false, "&");
+  }
+  table{
+    height: 1px;
+  }
+  .table{
+    overflow-x: initial;
+  }
+
+  .table-row{
+    position: relative;
+    &.hasHover{
+      cursor: pointer;
+      &:hover{
+        .table-cell{
+          background-color: var(--color-highlight-1);
+        }
+      }
+    }
+    .table-cell{
+      padding: 10px;
+      position: relative;
+      transition: .3s;
+      min-width: 150px;
+      background-color: var(--color-white);
+      font-size: 14px;
+      font-family: 'SomarRegular', sans-serif;
+      color: var(--color-black-light);
+      border-bottom: 1px solid var(--color-grey-20);
+      &.star-cell{
+        min-width: 40px;
+        &:hover{
+          path{
+            fill: var(--color-pending);
+          }
+        }
+      }
+      .table-link {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1;
+      }
+      &.wide-cell{
+        min-width: 240px;
+      }
+    }
+    &:hover{
+      .actions-cell{
+        opacity: 1;
+      }
+    }
+  }
+  .table-cell{
+    padding: 0;
+    border: none;
+    &.table-cell-checkbox{
+      min-width: 40px;
+      padding: 0;
+      span{
+        padding: 0 8px;
+        color: var(--color-neutrals-1000);
+        svg{
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+  .table-cell.table-cell-fixed{
+    position: sticky;
+    display: flex;
+    padding: 0;
+    height: 100%;
+    z-index: 1;
+    &.right{
+      right: 0;
+      border-left: 1px solid var(--color-neutrals-400);
+    }
+    &.left{
+      left: 0;
+      border-right: 1px solid var(--color-neutrals-400);
+    }
+  }
+  .table-cell-item{
+    width: 100%;
+    display: block;
+    min-width: 130px;
+    padding: 5px 10px;
+    font-family: 'Fira Sans', sans-serif;
+    line-height: 16px;
+    letter-spacing: 0.2px;
+    color: var(--color-neutrals-1000);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .table-head{
+    .table-cell{
+      background-color: var(--color-white);
+      span,
+      .table-cell-item{
+        display: flex;
+        justify-content: space-between;
+        padding: 0 8px;
+        margin: 10px 0;
+        color: var(--color-grey-70);
+        font-family: 'SomarMedium', sans-serif;
+        font-style: normal;
+        font-size: 10px;
+        line-height: 14px;
+        text-transform: uppercase;
+        border-right: 1px solid var(--color-grey-20);
+        letter-spacing: 0;
+        svg{
+          opacity: 1;
+          width: 16px;
+          height: 16px;
+        }
+      }
+      &[aria-sort=descending]{
+        svg{
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+  .table-cell.actions-cell{
+    position: absolute;
+    top: 5px;
+    right: 0;
+    min-width: 0;
+    z-index: 5;
+    cursor: pointer;
+    opacity: 0;
+    transition: .3s;
+    path{
+      fill: var(--color-error-400);
+      transition: .3s;
+    }
+    &:hover{
+      path{
+        fill: var(--color-error-500)
+      }
+    }
+  }
+}

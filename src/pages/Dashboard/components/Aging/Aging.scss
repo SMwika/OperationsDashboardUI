@@ -1,0 +1,128 @@
+.aging-card {
+  padding: 8px 8px 6px;
+
+  &__header {
+    padding: 2px 6px 8px;
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    h4 {
+      margin: 0;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+
+      path {
+        fill: #9ca3af;
+      }
+    }
+  }
+
+  &__actions {
+    display: inline-flex;
+    border: 1px solid var(--color-grey-20);
+    border-radius: 6px;
+    overflow: hidden;
+
+    button {
+      border: 0;
+      background: #f8fafc;
+      color: #6b7280;
+      font-size: 10px;
+      padding: 5px 10px;
+      line-height: 1;
+      cursor: pointer;
+
+      &.active {
+        background: #1f8682;
+        color: #fff;
+      }
+    }
+  }
+
+  .table-wrap {
+    table {
+      font-size: 10px;
+
+      thead th {
+        font-size: 10px;
+        text-transform: none;
+        color: #6b7280;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      th,
+      td {
+        padding: 7px 8px;
+      }
+
+      tbody td {
+        color: #374151;
+      }
+    }
+  }
+
+  .aging-row {
+    &--highlight {
+      background: #eff3f8;
+    }
+  }
+
+  .aging-label {
+    min-width: 260px;
+
+    &__content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  .aging-indent {
+    display: inline-block;
+
+    &--0 {
+      width: 0;
+    }
+
+    &--1 {
+      width: 14px;
+    }
+
+    &--2 {
+      width: 28px;
+    }
+  }
+
+  .aging-toggle {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1px solid #9ca3af;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 14px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &--ghost {
+      opacity: 1;
+    }
+  }
+
+  .total-row td {
+    background: #f7f7f8;
+    color: #111827;
+    font-family: "SomarMedium", sans-serif;
+  }
+}

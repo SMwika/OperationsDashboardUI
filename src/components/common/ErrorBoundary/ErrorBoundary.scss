@@ -1,0 +1,14 @@
+.errorBoundary{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  h3{
+    color: var(--color-waiting);
+    margin: 10px 0;
+  }
+  svg{
+    width: 100px;
+    height: 100px;
+  }
+}

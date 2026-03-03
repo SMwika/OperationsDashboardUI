@@ -1,0 +1,88 @@
+.distribution-effort {
+  padding: 10px 12px 8px;
+
+  &__header {
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    h4 {
+      margin: 0;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+
+      path {
+        fill: #9ca3af;
+      }
+    }
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    label {
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    select {
+      height: 24px;
+      border: 1px solid var(--color-grey-20);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      color: #4b5563;
+      background: #fff;
+    }
+  }
+
+  &__time,
+  &__tabs {
+    display: inline-flex;
+    border: 1px solid var(--color-grey-20);
+    border-radius: 4px;
+    overflow: hidden;
+
+    button {
+      border: 0;
+      background: #f8fafc;
+      color: #6b7280;
+      font-size: 10px;
+      line-height: 1;
+      padding: 6px 8px;
+      cursor: pointer;
+
+      &.active {
+        background: #1f8682;
+        color: #fff;
+      }
+    }
+  }
+
+  .recharts-default-legend {
+    margin-top: 2px !important;
+  }
+
+  .recharts-cartesian-grid-horizontal line {
+    stroke: #e5e7eb;
+  }
+
+  .recharts-legend-item-text {
+    color: #6b7280 !important;
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,41 @@
+.mainFilters{
+  .mainFilters-info{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .manager-info {
+      .manager {
+        padding: 8px 12px;
+        border: 1px solid var(--color-grey-30);
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+
+        .manager-img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          overflow: hidden;
+        }
+
+        .manager-content {
+          .manager-position {
+            font-size: 12px;
+            line-height: 16px;
+            color: var(--color-grey-70);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+          }
+
+          .manager-name {
+            font-size: 14px;
+            line-height: 16px;
+            color: var(--color-black-light);
+            font-family: "SomarMedium", sans-serif;
+          }
+        }
+      }
+    }
+  }
+}
