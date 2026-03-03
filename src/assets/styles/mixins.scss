@@ -1,0 +1,78 @@
+@mixin placeholder {
+  &::-webkit-input-placeholder {@content}
+  &:-moz-placeholder           {@content}
+  &::-moz-placeholder          {@content}
+  &:-ms-input-placeholder      {@content}
+};
+
+@mixin scrollbar($transparent: false, $prefix: "") {
+  @if $transparent {
+    #{$prefix}::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    #{$prefix}::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+    }
+    #{$prefix}::-webkit-scrollbar-thumb {
+      background: transparent;
+      border: 0 none transparent;
+      border-radius: 16px;
+    }
+    #{$prefix}::-webkit-scrollbar-thumb:hover {
+      background: transparent;
+    }
+    #{$prefix}::-webkit-scrollbar-thumb:active {
+      background: transparent;
+    }
+    #{$prefix}::-webkit-scrollbar-track {
+      background: transparent;
+      border: 0 none #ffffff;
+      border-radius: 16px;
+    }
+    #{$prefix}::-webkit-scrollbar-track:hover {
+      background: transparent;
+    }
+    #{$prefix}::-webkit-scrollbar-track:active {
+      background: transparent;
+    }
+    #{$prefix}::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+  } @else {
+    #{$prefix}::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    #{$prefix}::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+    }
+    #{$prefix}::-webkit-scrollbar-thumb {
+      background: var(--color-primary);
+      border: 0 none var(--color-grey-10);
+      border-radius: 16px;
+    }
+    #{$prefix}::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary);
+    }
+    #{$prefix}::-webkit-scrollbar-thumb:active {
+      background: var(--color-primary);
+    }
+    #{$prefix}::-webkit-scrollbar-track {
+      background: var(--color-grey-20);
+      border: 0 none #ffffff;
+      border-radius: 16px;
+    }
+    #{$prefix}::-webkit-scrollbar-track:hover {
+      background: var(--color-grey-20);
+    }
+    #{$prefix}::-webkit-scrollbar-track:active {
+      background: var(--color-grey-10);
+    }
+    #{$prefix}::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+  }
+};

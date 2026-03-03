@@ -1,0 +1,97 @@
+@use "../../../assets/styles/mixins.scss" as *;
+
+
+.dropDown {
+  display: flex;
+  .MuiButton-text, input{
+    padding: 8px 12px;
+    background-color: var(--color-box);
+    color: var(--color-text-main);
+    font-family: "SomarMedium", sans-serif;
+    border: 1px solid var(--color-grey-30);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  input:not(:placeholder-shown) {
+    color: var(--color-active2);
+    background-color: var(--color-highlight-1);
+    border-color: var(--color-highlight-1);
+  }
+  input::placeholder{
+    color: var(--color-black-light);
+    font-family: "SomarMedium", sans-serif;
+    overflow: hidden;
+  }
+  p{
+    font-size: 14px;
+    line-height: 16px;
+    font-family: 'SomarMedium', sans-serif;
+    text-transform: none;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  &__count{
+    font-size: 14px;
+    line-height: 16px;
+    font-family: 'SomarMedium', sans-serif;
+    margin-left: 4px;
+  }
+  img{
+    transition: .3s;
+    opacity: .5;
+    &:hover{
+      opacity: 1;
+    }
+  }
+
+  .clear{
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+  }
+
+  .MuiList-root{
+    background-color: var(--color-box);
+  }
+  .dropDown-items{
+    max-height: 300px;
+    max-width: 320px;
+    overflow: auto;
+    @include scrollbar(false, "&");
+    .MuiMenuItem-root{
+      padding: 0;
+    }
+    .MuiFormControlLabel-root{
+      width: 100%;
+      margin: 0;
+      padding-right: 10px;
+    }
+    .load-more{
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .MuiTypography-root{
+      font-family: "SomarMedium", sans-serif;
+      font-size: 14px;
+      color: var(--color-text-main);
+      text-wrap: auto;
+    }
+    .MuiCheckbox-root{
+      padding: 3px 9px;
+    }
+    .MuiCheckbox-root.Mui-checked {
+      color: var(--color-tahakom);
+    }
+  }
+  .apply-btn{
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    margin: 10px 10px 0;
+  }
+}

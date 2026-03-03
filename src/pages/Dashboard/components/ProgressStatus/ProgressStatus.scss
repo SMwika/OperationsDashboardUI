@@ -1,0 +1,97 @@
+.progress-status {
+  .progress-status__header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7ed;
+
+    .title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      span {
+        color: #111827;
+        font-size: 15px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .progress-status__controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .progress-status__dates {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    input {
+      border: 1px solid var(--color-grey-20);
+      border-radius: 6px;
+      height: 28px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--color-neutral-700);
+      background-color: var(--color-white);
+    }
+  }
+
+  .progress-status__range-rail {
+    position: relative;
+    width: 92px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(31, 134, 130, 0.25);
+
+    .dot {
+      position: absolute;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #1f8682;
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 2px #fff;
+
+      &--left {
+        left: 0;
+      }
+
+      &--right {
+        right: 0;
+      }
+    }
+  }
+
+  .progress-status__switch {
+    display: inline-flex;
+    border: 1px solid var(--color-grey-20);
+    border-radius: 6px;
+    overflow: hidden;
+
+    button {
+      border: 0;
+      background: transparent;
+      color: var(--color-neutral-700);
+      padding: 5px 10px;
+      font-size: 11px;
+      cursor: pointer;
+
+      &.active {
+        background: #1f8682;
+        color: #fff;
+      }
+    }
+  }
+
+  .recharts-legend-wrapper {
+    top: 2px !important;
+  }
+
+  .recharts-surface {
+    overflow: visible;
+  }
+}

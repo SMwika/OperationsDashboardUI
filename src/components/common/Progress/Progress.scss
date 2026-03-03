@@ -1,0 +1,11 @@
+.progressbar{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "SomarMedium", sans-serif;
+  max-width: max-content;
+  div[role="progressbar"] {
+    display: flex;
+    align-items: center;
+  }
+}

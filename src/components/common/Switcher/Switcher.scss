@@ -1,0 +1,40 @@
+.MuiFormControlLabel-root{
+
+  &.MuiFormControlLabel-labelPlacementStart{
+    margin: 0;
+  }
+  .MuiSwitch-root{
+    width: 56px;
+    height: 40px;
+    .MuiButtonBase-root{
+      .MuiSwitch-thumb{
+        width: 12px;
+        height: 12px;
+      }
+    }
+    .MuiSwitch-switchBase{
+      padding: 14px;
+      .MuiSwitch-track{
+        background-color: var(--color-grey-40);
+        opacity: 1;
+      }
+      &.Mui-checked{
+        transform: translateX(16px);
+        color: var(--color-white);
+        & + .MuiSwitch-track{
+          background-color: var(--color-primary);
+          opacity: 1;
+        }
+      }
+      &.Mui-disabled+.MuiSwitch-track {
+        opacity: 0.12;
+      }
+    }
+  }
+  .MuiTypography-body1 {
+    font-size: 14px;
+    line-height: 16px;
+    font-family: "SomarMedium",sans-serif;
+    color: var(--color-black-light);
+  }
+}

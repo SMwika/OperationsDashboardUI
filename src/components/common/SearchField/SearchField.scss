@@ -1,0 +1,54 @@
+@import "../../../assets/styles/mixins";
+
+.searchField {
+  position: relative;
+  justify-content: flex-start;
+  width: auto;
+
+  .search svg {
+    position: absolute;
+    left: 10px;
+    width: 24px;
+    height: 24px;
+    top: 8px;
+  }
+
+  .close {
+    svg{
+      position: absolute;
+      opacity: 0;
+      right: 0;
+      height: 42px;
+      width: 42px;
+      padding: 8px;
+    }
+    &.active svg{
+      opacity: 1;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background: rgba(#612551, .1);
+    }
+  }
+
+  input {
+    padding: 8px 40px;
+    width: 320px;
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--color-grey-40);
+    border: 1px solid var(--color-grey-20);
+    border-radius: 4px;
+    background: var(--color-grey-10);
+
+    @include placeholder {
+      color: var(--color-grey-40);
+    }
+
+    &.open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}

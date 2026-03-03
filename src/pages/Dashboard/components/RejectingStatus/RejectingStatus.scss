@@ -1,0 +1,48 @@
+.mini-stat-card {
+  padding: 10px 12px 8px;
+
+  .card-title-row {
+    margin-bottom: 2px;
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    h4 {
+      font-size: 12px;
+      line-height: 16px;
+      margin: 0;
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+
+      path {
+        fill: #9ca3af;
+      }
+    }
+  }
+
+  &__meta {
+    margin: 0 0 6px;
+    text-align: center;
+    font-size: 10px;
+    color: #6b7280;
+
+    span {
+      margin: 0 6px;
+      color: #cbd5e1;
+    }
+  }
+
+  .chart-area--small {
+    min-height: 185px;
+  }
+
+  .recharts-cartesian-grid-horizontal line {
+    stroke: #e5e7eb;
+  }
+}

@@ -1,0 +1,222 @@
+button.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  background-color: var(--color-primary);
+  border: 2px solid rgba(0, 0, 0, .1);
+  border-radius: 4px;
+  user-select: none;
+  font-family: 'SomarRegular', sans-serif;
+  transition: .3s;
+  position: relative;
+  gap: 8px;
+
+  &.disabled {
+    pointer-events: none !important;
+    opacity: .3;
+    cursor: default;
+  }
+
+  &:hover, &.active {
+    cursor: pointer;
+  }
+
+  img {
+    width: 24px;
+  }
+  .MuiCircularProgress-root{
+    margin: 0 8px 0 0;
+  }
+  img, svg {
+    display: flex;
+    //height: 24px;
+    //position: absolute;
+    //left: 16px;
+    path{
+      fill: currentColor;
+    }
+
+    & + p {
+      padding-left: 34px;
+    }
+  }
+  &.withoutText{
+    img, svg{
+      position: static;
+      & + p {
+        margin-left: 10px;
+        padding: 0;
+      }
+    }
+  }
+
+  span {
+    display: flex;
+    height: 17px;
+    margin-right: 8px;
+    color: var(--color-white);
+    width: 21px;
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--color-white);
+    font-family: 'SomarMedium', sans-serif;
+  }
+
+  //svg { color: var(--color-white) }
+
+  &.button-smaller p {
+    font-size: 14px;
+  }
+
+  &.small{
+    padding: 3px 5px;
+    p {
+      font-size: 12px;
+      line-height: 16px;
+    }
+    img, svg {
+      height: 16px;
+      path{
+        fill: currentColor;
+      }
+      & + p{
+        margin-left: 4px;
+      }
+    }
+  }
+
+  &.button-color-0 {
+    &:hover, &.active {
+      opacity: .7;
+    }
+  }
+
+  &.button-color-1 {
+    background-color: var(--color-grey-10);
+    border: 2px solid var(--color-grey-10);
+
+    &:hover, &.active {
+      background-color: var(--color-grey-20);
+      border-color: var(--color-grey-20);
+    }
+
+    p, span {
+      color: var(--color-tahakom);
+    }
+  }
+
+  &.button-color-2 {
+    background-color: transparent;
+    border: 2px solid var(--color-grey-20);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-text-main);
+    }
+  }
+
+  &.button-color-3 {
+    background-color: transparent;
+    border-color: transparent;
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-primary);
+    }
+  }
+
+  &.button-color-4 {
+    background-color: var(--color-additional-3);
+    border-color: var(--color-additional-3);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-white);
+    }
+  }
+
+  &.button-color-5 {
+    background-color: var(--color-waiting);
+    border-color: var(--color-waiting);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-white);
+    }
+  }
+
+  &.button-color-6 {
+    background-color: var(--color-pending);
+    border-color: var(--color-pending);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-white);
+    }
+  }
+
+  &.button-color-7 {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-white);
+    }
+  }
+
+  &.button-color-8 {
+    background-color: var(--color-text-main);
+    border-color: var(--color-text-main);
+
+    &:hover, &.active {
+      opacity: .7;
+    }
+
+    p, span {
+      color: var(--color-white);
+    }
+  }
+
+  &.button-color-9 {
+    background-color: var(--color-grey-10);
+    border: 2px solid var(--color-grey-10);
+
+    &:hover, &.active {
+      background-color: var(--color-grey-20);
+      border-color: var(--color-grey-20);
+    }
+
+    p, span {
+      color: var(--color-waiting);
+    }
+  }
+
+  .arrow {
+    margin-left: 8px;
+  }
+  & + .export-btn{
+    position: absolute;
+  }
+}

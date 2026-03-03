@@ -1,0 +1,52 @@
+@use "../../assets/styles/mixins.scss" as *;
+
+.filters{
+  display: flex;
+  gap: 8px;
+  // justify-content: flex-end;
+  align-items: center;
+  .all {
+    color: var(--color-tahakom);
+    font-family: "SomarMedium", sans-serif;
+    cursor: pointer;
+    padding: 8px 16px;
+    background-color: var(--color-grey-10);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .clear {
+    color: var(--color-tahakom);
+    font-family: "SomarMedium", sans-serif;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .dropDown{
+    flex: none;
+    & > .MuiButtonBase-root{
+      &.filtered,
+      &:hover{
+        color: var(--color-active2);
+        background-color: var(--color-highlight-1);
+        border-color: var(--color-highlight-1);
+      }
+    }
+  }
+  &__head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "SomarMedium", sans-serif;
+    color: var(--color-text-secondary);
+  }
+  &__clear-btn{
+    font-size: 16px;
+    margin: 0 15px;
+    cursor: pointer;
+    transition: .3s;
+    &:hover{
+      opacity: .7;
+    }
+  }
+}
