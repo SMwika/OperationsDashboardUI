@@ -1,6 +1,7 @@
 import { FC, Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InfoCircle from "@/assets/icons/info-circle.svg";
+import { useGetAgingQuery } from "@/store/dashboard/dashboard.api.ts";
 import "./Aging.scss";
 
 type AgingValue = number | null;
@@ -32,133 +33,125 @@ const COLUMNS = [
   { key: "total", label: "TOTAL" },
 ] as const;
 
-const SAMPLE_ROWS: IAgingRow[] = [
-  {
-    id: "on-schedule",
-    label: "On Schedule",
-    level: 0,
-    values: {
-      d1_7: 1,
-      d8_14: 2,
-      d15_21: null,
-      d21_30: 1,
-      d31_60: 3,
-      d60p: 2,
-      total: 14,
-    },
-  },
-  {
-    id: "late",
-    label: "Late",
-    level: 0,
-    expandable: true,
-    values: {
-      d1_7: null,
-      d8_14: 1,
-      d15_21: null,
-      d21_30: null,
-      d31_60: null,
-      d60p: null,
-      total: 2,
-    },
-    children: [
-      {
-        id: "late-operations",
-        label: "Operations",
-        level: 1,
-        expandable: true,
-        values: {
-          d1_7: null,
-          d8_14: null,
-          d15_21: null,
-          d21_30: null,
-          d31_60: null,
-          d60p: null,
-          total: null,
-        },
-        children: [
-          {
-            id: "late-bug",
-            label: "Bug",
-            level: 2,
-            values: {
-              d1_7: null,
-              d8_14: null,
-              d15_21: null,
-              d21_30: null,
-              d31_60: null,
-              d60p: null,
-              total: null,
-            },
-          },
-          {
-            id: "late-data-change",
-            label: "Data Change",
-            level: 2,
-            values: {
-              d1_7: null,
-              d8_14: null,
-              d15_21: null,
-              d21_30: null,
-              d31_60: null,
-              d60p: null,
-              total: null,
-            },
-          },
-          {
-            id: "late-general-enquiry",
-            label: "General Enquiry",
-            level: 2,
-            values: {
-              d1_7: null,
-              d8_14: null,
-              d15_21: null,
-              d21_30: null,
-              d31_60: null,
-              d60p: null,
-              total: null,
-            },
-          },
-        ],
-      },
-      {
-        id: "late-enhancement",
-        label: "Enhancement",
-        level: 1,
-        values: {
-          d1_7: null,
-          d8_14: null,
-          d15_21: null,
-          d21_30: null,
-          d31_60: null,
-          d60p: null,
-          total: null,
-        },
-      },
-    ],
-  },
-];
-
-const SAMPLE_TOTAL = {
-  d1_7: 8,
-  d8_14: 41,
-  d15_21: 7,
-  d21_30: 23,
-  d31_60: 17,
-  d60p: 17,
-  total: 163,
+const bucketToColumnKey: Record<string, keyof IAgingRow["values"]> = {
+  "1-7": "d1_7",
+  "8-14": "d8_14",
+  "15-21": "d15_21",
+  "21-30": "d21_30",
+  "31-60": "d31_60",
+  "60+": "d60p",
 };
 
 const renderValue = (value: AgingValue) => (value == null ? "-" : value);
 
-const Aging: FC = () => {
-  const { t } = useTranslation();
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    late: true,
-    "late-operations": true,
-  });
+const emptyAgingValues = (): IAgingRow["values"] => ({
+  d1_7: null,
+  d8_14: null,
+  d15_21: null,
+  d21_30: null,
+  d31_60: null,
+  d60p: null,
+  total: null,
+});
 
-  const rows = useMemo(() => SAMPLE_ROWS, []);
+const formatTreeLabel = (value: string) =>
+  value
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
+interface IAgingProps {
+  asOf?: string;
+}
+
+const Aging: FC<IAgingProps> = ({ asOf }) => {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const agingQuery = useGetAgingQuery({ asOf: asOf || "" }, { skip: !asOf });
+
+  const hasData = !!agingQuery.data?.rows?.length;
+
+  const rows = useMemo(
+    () =>
+      (agingQuery.data?.rows || []).map((row) => {
+        const values: IAgingRow["values"] = {
+          d1_7: null,
+          d8_14: null,
+          d15_21: null,
+          d21_30: null,
+          d31_60: null,
+          d60p: null,
+          total: row.total,
+        };
+
+        Object.entries(row.counts || {}).forEach(([bucket, count]) => {
+          const key = bucketToColumnKey[bucket];
+          if (key) {
+            values[key] = count;
+          }
+        });
+
+        const statusTree = agingQuery.data?.tree?.[row.status] || null;
+        const children = statusTree
+          ? Object.entries(statusTree).map(([category, types]) => {
+              const categoryId = `${row.status}-${category}`
+                .toLowerCase()
+                .replace(/\s+/g, "-");
+
+              return {
+                id: categoryId,
+                label: formatTreeLabel(category),
+                level: 1,
+                expandable: !!types?.length,
+                values: emptyAgingValues(),
+                children: (types || []).map((type) => ({
+                  id: `${categoryId}-${type}`
+                    .toLowerCase()
+                    .replace(/\s+/g, "-"),
+                  label: formatTreeLabel(type),
+                  level: 2,
+                  values: emptyAgingValues(),
+                })),
+              } as IAgingRow;
+            })
+          : undefined;
+
+        return {
+          id: row.status.toLowerCase().replace(/\s+/g, "-"),
+          label: row.status,
+          level: 0,
+          expandable: !!children?.length,
+          children,
+          values,
+        } as IAgingRow;
+      }),
+    [agingQuery.data?.rows, agingQuery.data?.tree],
+  );
+
+  const totalValues = useMemo(() => {
+    const values: IAgingRow["values"] = {
+      d1_7: null,
+      d8_14: null,
+      d15_21: null,
+      d21_30: null,
+      d31_60: null,
+      d60p: null,
+      total: agingQuery.data?.totals?.total ?? null,
+    };
+
+    const bucketTotals = agingQuery.data?.totals?.bucketTotals || {};
+    Object.entries(bucketTotals).forEach(([bucket, count]) => {
+      const key = bucketToColumnKey[bucket];
+      if (key) {
+        values[key] = count;
+      }
+    });
+
+    return values;
+  }, [agingQuery.data]);
 
   const toggle = (id: string) => {
     setExpanded((prev) => ({
@@ -228,29 +221,37 @@ const Aging: FC = () => {
       </div>
 
       <div className='table-wrap'>
-        <table>
-          <thead>
-            <tr>
-              <th>{t("Invoice Status")}</th>
-              {COLUMNS.map((column) => (
-                <th key={column.key}>{t(column.label)}</th>
-              ))}
-            </tr>
-          </thead>
+        {hasData ? (
+          <table>
+            <thead>
+              <tr>
+                <th>{t("Invoice Status")}</th>
+                {COLUMNS.map((column) => (
+                  <th key={column.key}>{t(column.label)}</th>
+                ))}
+              </tr>
+            </thead>
 
-          <tbody>
-            {rows.map((row) => renderRow(row))}
+            <tbody>
+              {rows.map((row) => renderRow(row))}
 
-            <tr className='total-row'>
-              <td>{t("TOTAL")}</td>
-              {COLUMNS.map((column) => (
-                <td key={`total-${column.key}`}>
-                  {renderValue(SAMPLE_TOTAL[column.key])}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
+              <tr className='total-row'>
+                <td>{t("TOTAL")}</td>
+                {COLUMNS.map((column) => (
+                  <td key={`total-${column.key}`}>
+                    {renderValue(totalValues[column.key])}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        ) : (
+          <p className='dashboard-note'>
+            {agingQuery.isLoading
+              ? t("Loading dashboard data...")
+              : t("No data available")}
+          </p>
+        )}
       </div>
     </section>
   );

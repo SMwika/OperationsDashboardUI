@@ -1,50 +1,50 @@
-# React + TypeScript + Vite
+# Operations Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Run locally
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+```bash
+npm install
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Docker (production)
 
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
+Build image:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
+```bash
+docker build \
+  --build-arg VITE_AZURE_AD_CLIENT_ID=your-client-id \
+  --build-arg VITE_AZURE_AD_TENANT_ID=your-tenant-id \
+  --build-arg VITE_AZURE_AD_REDIRECT_URI=https://your-domain/landing \
+  --build-arg VITE_AZURE_AD_API_SCOPE=User.Read \
+  -t operations-dashboard:latest .
 ```
+
+Run container:
+
+```bash
+docker run --rm -p 8080:80 operations-dashboard:latest
+```
+
+Export image:
+
+```bash
+docker save -o operations-dashboard_1.0.0.tar operations-dashboard:latest
+gzip operations-dashboard_1.0.0.tar
+```
+
+Or retag first, then save
+
+```bash
+docker tag operations-dashboard:latest operations-dashboard:1.0.0
+docker save -o operations-dashboard_1.0.0.tar operations-dashboard:1.0.0
+gzip operations-dashboard_1.0.0.tar
+```
+
+Open app at `http://localhost:8080`.
+
+Notes:
+
+- Container serves static files with Nginx.
+- SPA routes are supported via `try_files ... /index.html`.
+- `/api/*` is proxied to the configured backend in `nginx.conf`.

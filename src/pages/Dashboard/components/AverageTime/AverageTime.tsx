@@ -10,35 +10,56 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetAvgTimeByEmployeeQuery } from "@/store/dashboard/dashboard.api.ts";
 import InfoCircle from "@/assets/icons/info-circle.svg";
 import "./AverageTime.scss";
 
-const SAMPLE_DATA = [
-  {
-    assignee: "Mohamed Mahmoud Abd El",
-    value: 137.92,
-    durationLabel: "137d 22h",
-  },
-  { assignee: "Zaman Yousaf Goraya", value: 15, durationLabel: "15d 0h" },
-  { assignee: "Jayaraju Vedala", value: 4.83, durationLabel: "4d 20h" },
-  { assignee: "Revanth Kumar", value: 4.79, durationLabel: "4d 19h" },
-  { assignee: "Mohammed Bafadhl", value: 3.58, durationLabel: "3d 14h" },
-  { assignee: "Mohammed Oman Baiker", value: 2.29, durationLabel: "2d 7h" },
-  { assignee: "Jahangir Ahmad Nakoo", value: 2.21, durationLabel: "2d 5h" },
-  { assignee: "Abdulaziz Abuafaraj", value: 2.0, durationLabel: "2d 0h" },
-  { assignee: "-", value: 1.96, durationLabel: "2d 23" },
-  {
-    assignee: "Nansakishor Dhanaji Vala...",
-    value: 2.5,
-    durationLabel: "2d 12h",
-  },
-];
+interface IAverageTimeProps {
+  startDate?: string;
+  endDate?: string;
+}
 
-const AverageTime: FC = () => {
+const formatRequestorLabel = (value: string) => {
+  if (value === "Unknown") {
+    return value;
+  }
+
+  const match = value.match(/^by:([^,]+)/i);
+  return match?.[1]?.trim() || value;
+};
+
+const AverageTime: FC<IAverageTimeProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"close" | "open">("close");
+  const avgTimeQuery = useGetAvgTimeByEmployeeQuery(
+    {
+      startDate: startDate || "",
+      endDate: endDate || "",
+    },
+    {
+      skip: !startDate || !endDate,
+    },
+  );
 
-  const data = useMemo(() => SAMPLE_DATA, []);
+  const data = useMemo(() => {
+    if (activeTab === "close") {
+      return (avgTimeQuery.data?.rows?.assignees || []).map((item) => ({
+        label: item.assignee,
+        value: item.avgHours,
+        durationLabel: `${item.avgHours.toFixed(2)}h`,
+      }));
+    }
+
+    return (avgTimeQuery.data?.rows?.requestors || []).map((item) => ({
+      label: formatRequestorLabel(item.requestor),
+      value: item.openedCount,
+      durationLabel: `${item.openedCount}`,
+    }));
+  }, [activeTab, avgTimeQuery.data]);
+
+  const hasData = data.length > 0;
+  const maxValue = data.reduce((max, item) => Math.max(max, item.value), 0);
+  const xDomainMax = maxValue > 0 ? Math.ceil(maxValue * 1.1) : 10;
 
   return (
     <section className='dashboard-card chart-card average-time'>
@@ -65,44 +86,51 @@ const AverageTime: FC = () => {
       </div>
 
       <div className='chart-area'>
-        <ResponsiveContainer width='100%' height={430}>
-          <BarChart
-            data={data}
-            layout='vertical'
-            margin={{ top: 6, right: 20, left: 2, bottom: 8 }}
-            barCategoryGap='40%'>
-            <CartesianGrid strokeDasharray='4 4' />
-            <XAxis
-              type='number'
-              domain={[0, 210]}
-              ticks={[20, 40, 60, 80, 100, 120, 140, 180, 160, 200]}
-              tick={{ fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              type='category'
-              dataKey='assignee'
-              width={140}
-              tick={{ fontSize: 12 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              formatter={(value, _name, props) => [
-                `${value} days`,
-                props?.payload?.durationLabel || "",
-              ]}
-            />
-            <Bar dataKey='value' fill='#1f8682' radius={[0, 0, 0, 0]}>
-              <LabelList
-                dataKey='durationLabel'
-                position='right'
-                style={{ fill: "#6b7280", fontSize: 12 }}
+        {hasData ? (
+          <ResponsiveContainer width='100%' height={430}>
+            <BarChart
+              data={data}
+              layout='vertical'
+              margin={{ top: 6, right: 20, left: 2, bottom: 8 }}
+              barCategoryGap='40%'>
+              <CartesianGrid strokeDasharray='4 4' />
+              <XAxis
+                type='number'
+                domain={[0, xDomainMax]}
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
               />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+              <YAxis
+                type='category'
+                dataKey='label'
+                width={180}
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                formatter={(value, _name, props) => [
+                  activeTab === "close" ? `${value}h` : value,
+                  props?.payload?.durationLabel || "",
+                ]}
+              />
+              <Bar dataKey='value' fill='#1f8682' radius={[0, 0, 0, 0]}>
+                <LabelList
+                  dataKey='durationLabel'
+                  position='right'
+                  style={{ fill: "#6b7280", fontSize: 12 }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className='dashboard-note'>
+            {avgTimeQuery.isLoading
+              ? t("Loading dashboard data...")
+              : t("No data available")}
+          </p>
+        )}
       </div>
     </section>
   );

@@ -12,60 +12,60 @@
   user-select: none;
   left: 0;
   right: 0;
-  border-bottom: 1px solid #EEEEEE;
+  border-bottom: 1px solid #eeeeee;
   padding: 0 14px;
-  transition: .3s;
+  transition: 0.3s;
   color: var(--color-black-light);
 
   .section {
     display: flex;
     height: var(--header-height);
     align-items: center;
-    &.left{
+    &.left {
       flex: none;
       margin-right: 5%;
       gap: 16px;
-      .otherApps{
+      .otherApps {
         height: 100%;
         padding-right: 16px;
         display: flex;
         align-items: center;
         border-right: 1px solid var(--color-grey-20);
         cursor: pointer;
-        transition: .3s;
-        &:hover{
-          opacity: .7;
+        transition: 0.3s;
+        &:hover {
+          opacity: 0.7;
         }
       }
-      .site-name{
-        span{
+      .site-name {
+        span {
           font-size: 10px;
           line-height: 14px;
           color: var(--color-grey-70);
           font-family: SomarMedium, sans-serif;
         }
       }
-      h2{
+      h2 {
         font-size: 18px;
         line-height: 24px;
       }
       .logo {
-        transition: .3s;
-        img{
+        transition: 0.3s;
+        img {
           max-width: 100%;
           height: auto;
           width: 40px;
         }
-        // svg{
-        //   width: 40px;
-        //   height: 40px;
-        // }
-        &:hover{
-          opacity: .7;
+        svg {
+          width: 40px;
+          height: 40px;
+        }
+        &:hover {
+          opacity: 0.7;
         }
       }
     }
-    &.middle{
+    &.middle {
       margin-right: 20px;
       position: relative;
       flex: 1;
@@ -93,10 +93,10 @@
             color: var(--color-primary);
             text-decoration: none;
           }
-          &.active{
+          &.active {
             position: relative;
-            &::after{
-              content: '';
+            &::after {
+              content: "";
               position: absolute;
               bottom: 0;
               left: 0;
@@ -129,16 +129,16 @@
         color: #602650;
         min-width: 180px;
         cursor: pointer;
-        transition: .3s;
-        &:hover{
-          opacity: .7;
+        transition: 0.3s;
+        &:hover {
+          opacity: 0.7;
         }
-        svg{
-          transition: .3s;
+        svg {
+          transition: 0.3s;
         }
-        &.dropdownOpen{
-          opacity: .7;
-          svg{
+        &.dropdownOpen {
+          opacity: 0.7;
+          svg {
             transform: rotate(180deg);
           }
         }
@@ -150,7 +150,7 @@
             border-radius: 5px;
             &:hover {
               cursor: pointer;
-              background-color: rgba(0, 0, 0, .25);
+              background-color: rgba(0, 0, 0, 0.25);
             }
           }
         }
@@ -194,17 +194,17 @@
           position: relative;
           border-radius: 50%;
           cursor: pointer;
-          transition: .3s;
+          transition: 0.3s;
 
           &:hover {
-            opacity: .7;
+            opacity: 0.7;
           }
 
           img {
             height: 24px;
             width: 24px;
           }
-          &.active{
+          &.active {
             background-color: var(--color-grey-10);
           }
         }
@@ -213,16 +213,16 @@
   }
 }
 
-.menu{
-  .MuiMenu-paper{
+.menu {
+  .MuiMenu-paper {
     overflow: visible;
   }
-  .MuiMenu-list{
+  .MuiMenu-list {
     min-width: 100px;
-    .MuiMenuItem-root{
+    .MuiMenuItem-root {
       font-size: 14px;
       line-height: 16px;
-      font-family: 'SomarMedium', sans-serif;
+      font-family: "SomarMedium", sans-serif;
       position: relative;
       overflow: visible;
       letter-spacing: initial;
@@ -230,10 +230,12 @@
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      .subMenu{
+      .subMenu {
         background: var(--color-white);
         border: 1px solid var(--color-grey-10);
-        box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25), 3px 6px 6px rgba(0, 0, 0, 0.15);
+        box-shadow:
+          0 4px 4px rgba(0, 0, 0, 0.25),
+          3px 6px 6px rgba(0, 0, 0, 0.15);
         border-radius: 4px;
         position: absolute;
         left: 99%;
@@ -241,13 +243,13 @@
         width: 220px;
         display: none;
         padding: 8px 0;
-        li{
+        li {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
           white-space: initial;
           padding: 6px 16px;
-          span{
+          span {
             display: block;
             font-size: 12px;
             line-height: 16px;
@@ -256,9 +258,9 @@
           }
         }
       }
-      &:hover{
+      &:hover {
         background-color: rgba(0, 0, 0, 0.04);
-        .subMenu{
+        .subMenu {
           display: block;
         }
       }

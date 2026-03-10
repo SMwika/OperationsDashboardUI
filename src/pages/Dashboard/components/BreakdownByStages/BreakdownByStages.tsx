@@ -10,23 +10,35 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetStagesQuery } from "@/store/dashboard/dashboard.api.ts";
 import InfoCircle from "@/assets/icons/info-circle.svg";
 import "./BreakdownByStages.scss";
 
-const SAMPLE_DATA = [
-  { stage: "Created", count: 2 },
-  { stage: "Assigned", count: 172 },
-  { stage: "In Progress", count: 6 },
-  { stage: "On Hold", count: 27 },
-  { stage: "Rejected", count: 1224 },
-  { stage: "Done", count: 16002 },
-  { stage: "Closed", count: 808 },
-  { stage: "Un Hold", count: 4105 },
-  { stage: "Total", count: 2110 },
-];
+interface IBreakdownByStagesProps {
+  startDate?: string;
+  endDate?: string;
+}
 
-const BreakdownByStages: FC = () => {
+const BreakdownByStages: FC<IBreakdownByStagesProps> = ({
+  startDate,
+  endDate,
+}) => {
   const { t } = useTranslation();
+  const stagesQuery = useGetStagesQuery(
+    {
+      startDate: startDate || "",
+      endDate: endDate || "",
+    },
+    {
+      skip: !startDate || !endDate,
+    },
+  );
+
+  const data = stagesQuery.data?.stages || [];
+  const hasData = data.length > 0;
+
+  const maxCount = data.reduce((max, item) => Math.max(max, item.count), 0);
+  const xDomainMax = maxCount > 0 ? Math.ceil(maxCount * 1.1) : 100;
 
   return (
     <section className='dashboard-card chart-card breakdown-by-stages'>
@@ -38,40 +50,47 @@ const BreakdownByStages: FC = () => {
       </div>
 
       <div className='chart-area'>
-        <ResponsiveContainer width='100%' height={350}>
-          <BarChart
-            data={SAMPLE_DATA}
-            layout='vertical'
-            margin={{ top: 6, right: 18, left: 8, bottom: 6 }}
-            barCategoryGap='25%'>
-            <CartesianGrid strokeDasharray='4 4' vertical />
-            <XAxis
-              type='number'
-              domain={[0, 2200]}
-              ticks={[300, 600, 900, 1200, 1400, 1600, 1800, 2100]}
-              tick={{ fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              type='category'
-              dataKey='stage'
-              width={90}
-              tick={{ fontSize: 12 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip />
-            <Bar dataKey='count' radius={[0, 0, 0, 0]}>
-              {SAMPLE_DATA.map((item) => (
-                <Cell
-                  key={item.stage}
-                  fill={item.stage === "Total" ? "#7f89b8" : "#4a8589"}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        {hasData ? (
+          <ResponsiveContainer width='100%' height={350}>
+            <BarChart
+              data={data}
+              layout='vertical'
+              margin={{ top: 6, right: 18, left: 8, bottom: 6 }}
+              barCategoryGap='25%'>
+              <CartesianGrid strokeDasharray='4 4' vertical />
+              <XAxis
+                type='number'
+                domain={[0, xDomainMax]}
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                type='category'
+                dataKey='stage'
+                width={90}
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip />
+              <Bar dataKey='count' radius={[0, 0, 0, 0]}>
+                {data.map((item) => (
+                  <Cell
+                    key={item.stage}
+                    fill={item.stage === "Total" ? "#7f89b8" : "#4a8589"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className='dashboard-note'>
+            {stagesQuery.isLoading
+              ? t("Loading dashboard data...")
+              : t("No data available")}
+          </p>
+        )}
       </div>
     </section>
   );

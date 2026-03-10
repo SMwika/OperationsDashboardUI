@@ -18,12 +18,23 @@ import { useAppDispatch } from "@/hooks/redux.ts";
 import { setUserData } from "@/store/common/common.slice.ts";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
+import { useMsal } from "@azure/msal-react";
+import {
+  acquireAccessToken,
+  clearPersistedAccessToken,
+  isMsalConfigured,
+  loginRequest,
+  msalInstance,
+  persistAccessToken,
+  resolveActiveAccount,
+} from "@/auth/msal";
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { i18n } = useTranslation();
+  const { inProgress } = useMsal();
 
   useInsertionEffect(() => {
     const odooCss = document.querySelector(
@@ -34,27 +45,74 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    if (window.location.search.slice(1)) {
-      localStorage.setItem("encryptData", window.location.search.slice(1));
-      const parsed = decryptData(window.location.search.slice(1));
-      console.log(location.pathname, parsed, "parsed");
-      dispatch(setUserData(parsed));
+  // useEffect(() => {
+  //   const hydrateLegacySession = () => {
+  //     const encrypted = window.location.search.slice(1);
 
-      if (parsed.lang) {
-        sessionStorage.setItem("lang", parsed?.lang);
-      }
-      const lang = sessionStorage.getItem("lang");
-      if (lang) {
-        const nextLang = lang === "ar_001" ? "ar" : "en";
-        localStorage.setItem("i18nextLng", nextLang);
-        i18n.changeLanguage(nextLang);
-      }
-      if (parsed.username) {
-        navigate(location.pathname, { replace: true });
-      }
-    }
-  }, []);
+  //     if (!encrypted) {
+  //       return;
+  //     }
+
+  //     localStorage.setItem("encryptData", encrypted);
+  //     const parsed = decryptData(encrypted);
+  //     dispatch(setUserData(parsed));
+
+  //     if (parsed.lang) {
+  //       sessionStorage.setItem("lang", parsed.lang);
+  //     }
+
+  //     const lang = sessionStorage.getItem("lang");
+  //     if (lang) {
+  //       const nextLang = lang === "ar_001" ? "ar" : "en";
+  //       localStorage.setItem("i18nextLng", nextLang);
+  //       i18n.changeLanguage(nextLang);
+  //     }
+
+  //     if (parsed.username) {
+  //       navigate(location.pathname, { replace: true });
+  //     }
+  //   };
+
+  //   const initializeAzureSession = async () => {
+  //     try {
+  //       const redirectResult = await msalInstance.handleRedirectPromise();
+  //       const redirectAccount = redirectResult?.account;
+
+  //       if (redirectAccount) {
+  //         msalInstance.setActiveAccount(redirectAccount);
+  //       }
+
+  //       const account = resolveActiveAccount();
+
+  //       if (!account) {
+  //         clearPersistedAccessToken();
+  //         await msalInstance.loginRedirect(loginRequest);
+  //         return;
+  //       }
+
+  //       dispatch(
+  //         setUserData({
+  //           username: account.username,
+  //           stakeholder: account.tenantId ?? null,
+  //         }),
+  //       );
+
+  //       const tokenResponse = await acquireAccessToken(account);
+  //       if (tokenResponse?.accessToken) {
+  //         persistAccessToken(tokenResponse.accessToken);
+  //       }
+  //     } catch {
+  //       clearPersistedAccessToken();
+  //       await msalInstance.loginRedirect(loginRequest);
+  //     }
+  //   };
+
+  //   hydrateLegacySession();
+
+  //   if (isMsalConfigured && inProgress === "none") {
+  //     void initializeAzureSession();
+  //   }
+  // }, [dispatch, i18n, inProgress, location.pathname, navigate]);
 
   return (
     <div

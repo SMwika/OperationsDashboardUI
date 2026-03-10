@@ -40,7 +40,10 @@
       td {
         border-bottom: 1px solid #e5e7eb;
         padding: 8px 10px;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        max-width: 200px;
       }
 
       thead th {
@@ -52,6 +55,34 @@
 
       tbody td {
         color: #374151;
+      }
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 4px 0;
+
+    span {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    button {
+      border: 1px solid var(--color-grey-20);
+      border-radius: 6px;
+      background: #fff;
+      color: #4b5563;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
     }
   }

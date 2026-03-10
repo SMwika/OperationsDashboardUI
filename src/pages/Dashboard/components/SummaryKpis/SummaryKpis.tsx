@@ -1,108 +1,91 @@
 import { FC, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  CompletedIcon,
-  PendingIcon,
-  ProjectIcon,
-  SystemIcon,
-  UserIcon,
-  HorBarIcon,
+  StackIcon,
+  MeasureIcon,
+  BudgetIcon,
+  OrderIcon,
+  DollarIcon,
+  PurchasingOrderIcon,
 } from "@/components/Icons/Icons.tsx";
+import { ISummaryKpis } from "@/store/dashboard/dashboard.api.ts";
 import "./SummaryKpis.scss";
 
-interface ISummaryRange {
-  startDate: string;
-  endDate: string;
+interface ISummaryKpisProps {
+  data?: ISummaryKpis;
+  isLoading?: boolean;
 }
 
-interface ISummaryKpis {
-  totalTickets: number;
-  assignedTickets: number;
-  unassignedTickets: number;
-  solvedTickets: number;
-  avgAssignmentHours: number;
-  avgResolutionHours: number;
-}
+const formatAverage = (value: number) => {
+  if (Number.isInteger(value)) {
+    return value.toFixed(0);
+  }
 
-interface ISummaryResponse {
-  range: ISummaryRange;
-  kpis: ISummaryKpis;
-  overviewProgress: {
-    donut: { total: number; value: number; percent: number };
-    weekly: { percent: number };
-    monthly: { percent: number };
-    yearly: { percent: number };
-  };
-}
-
-const sampleSummaryData: ISummaryResponse = {
-  range: { startDate: "2026-01-01", endDate: "2026-02-01" },
-  kpis: {
-    totalTickets: 140,
-    assignedTickets: 100,
-    unassignedTickets: 40,
-    solvedTickets: 70,
-    avgAssignmentHours: 4,
-    avgResolutionHours: 4,
-  },
-  overviewProgress: {
-    donut: { total: 750, value: 585, percent: 78 },
-    weekly: { percent: 90 },
-    monthly: { percent: 78 },
-    yearly: { percent: 61 },
-  },
+  return value.toFixed(2);
 };
 
-const SummaryKpis: FC = () => {
+const SummaryKpis: FC<ISummaryKpisProps> = ({ data, isLoading }) => {
   const { t } = useTranslation();
+  const hasData = !!data;
 
   const items = useMemo(
-    () => [
-      {
-        key: "totalTickets",
-        label: t("Total Tickets"),
-        value: sampleSummaryData.kpis.totalTickets,
-        icon: ProjectIcon,
-        tone: "violet",
-      },
-      {
-        key: "assignedTickets",
-        label: t("Assigned Tickets"),
-        value: sampleSummaryData.kpis.assignedTickets,
-        icon: UserIcon,
-        tone: "pink",
-      },
-      {
-        key: "unassignedTickets",
-        label: t("Unassigned Tickets"),
-        value: sampleSummaryData.kpis.unassignedTickets,
-        icon: PendingIcon,
-        tone: "lilac",
-      },
-      {
-        key: "solvedTickets",
-        label: t("Solved Tickets"),
-        value: sampleSummaryData.kpis.solvedTickets,
-        icon: CompletedIcon,
-        tone: "mint",
-      },
-      {
-        key: "avgAssignmentHours",
-        label: t("Avg. Assignment (Hours)"),
-        value: sampleSummaryData.kpis.avgAssignmentHours.toFixed(0),
-        icon: HorBarIcon,
-        tone: "teal",
-      },
-      {
-        key: "avgResolutionHours",
-        label: t("Avg. Resolution (Hours)"),
-        value: sampleSummaryData.kpis.avgResolutionHours.toFixed(0),
-        icon: SystemIcon,
-        tone: "cyan",
-      },
-    ],
-    [t],
+    () =>
+      hasData
+        ? [
+            {
+              key: "totalTickets",
+              label: t("Total Tickets"),
+              value: data.totalTickets,
+              icon: BudgetIcon,
+              tone: "violet",
+            },
+            {
+              key: "assignedTickets",
+              label: t("Assigned Tickets"),
+              value: data.assignedTickets,
+              icon: DollarIcon,
+              tone: "violet",
+            },
+            {
+              key: "unassignedTickets",
+              label: t("Unassigned Tickets"),
+              value: data.unassignedTickets,
+              icon: MeasureIcon,
+              tone: "violet",
+            },
+            {
+              key: "solvedTickets",
+              label: t("Solved Tickets"),
+              value: data.solvedTickets,
+              icon: StackIcon,
+              tone: "mint",
+            },
+            {
+              key: "avgAssignmentHours",
+              label: t("Avg. Assignment (Hours)"),
+              value: formatAverage(data.avgAssignmentHours),
+              icon: PurchasingOrderIcon,
+              tone: "mint",
+            },
+            {
+              key: "avgResolutionHours",
+              label: t("Avg. Resolution (Hours)"),
+              value: formatAverage(data.avgResolutionHours),
+              icon: OrderIcon,
+              tone: "mint",
+            },
+          ]
+        : [],
+    [data, hasData, t],
   );
+
+  if (!hasData) {
+    return (
+      <p className='dashboard-note'>
+        {isLoading ? t("Loading dashboard data...") : t("No data available")}
+      </p>
+    );
+  }
 
   return (
     <div className='dashboard-grid dashboard-grid--stats summary-kpis'>

@@ -11,20 +11,43 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetTypeDistributionQuery } from "@/store/dashboard/dashboard.api.ts";
 import InfoCircle from "@/assets/icons/info-circle.svg";
 import "./TaskPerType.scss";
 
-const SAMPLE_DATA = [
-  { type: "Bug", count: 700, cumulative: 70 },
-  { type: "Enhancement", count: 150, cumulative: 86 },
-  { type: "New Development", count: 110, cumulative: 96 },
-  { type: "Project Support", count: 90, cumulative: 97 },
-];
-
 const BAR_COLORS = ["#7f3b76", "#d2b2d0", "#a8b9ce", "#9caec3"];
 
-const TaskPerType: FC = () => {
+interface ITaskPerTypeProps {
+  startDate?: string;
+  endDate?: string;
+}
+
+const TaskPerType: FC<ITaskPerTypeProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
+  const typeDistributionQuery = useGetTypeDistributionQuery(
+    {
+      startDate: startDate || "",
+      endDate: endDate || "",
+    },
+    {
+      skip: !startDate || !endDate,
+    },
+  );
+
+  const cumulativeMap = new Map(
+    (typeDistributionQuery.data?.cumulativePercent || []).map((item) => [
+      item.type,
+      item.percent,
+    ]),
+  );
+
+  const data = (typeDistributionQuery.data?.types || []).map((item) => ({
+    type: item.type,
+    count: item.count,
+    cumulative: cumulativeMap.get(item.type) ?? null,
+  }));
+
+  const hasData = data.length > 0;
 
   return (
     <section className='dashboard-card chart-card mini-stat-card task-per-type'>
@@ -35,49 +58,60 @@ const TaskPerType: FC = () => {
         </div>
       </div>
 
-      <div className='chart-area chart-area--small'>
-        <ResponsiveContainer width='100%' height={195}>
-          <ComposedChart data={SAMPLE_DATA} barGap={0} barSize={42}>
-            <CartesianGrid strokeDasharray='3 3' vertical={false} />
-            <XAxis
-              dataKey='type'
-              tick={{ fontSize: 9 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              yAxisId='left'
-              tick={{ fontSize: 10 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              yAxisId='right'
-              orientation='right'
-              domain={[0, 100]}
-              tick={{ fontSize: 10 }}
-              tickFormatter={(value) => `${value}%`}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip />
-            <Bar yAxisId='left' dataKey='count' radius={[4, 4, 0, 0]}>
-              {SAMPLE_DATA.map((item, index) => (
-                <Cell key={item.type} fill={BAR_COLORS[index]} />
-              ))}
-            </Bar>
-            <Line
-              yAxisId='right'
-              type='monotone'
-              dataKey='cumulative'
-              stroke='#67c5a2'
-              strokeWidth={2}
-              dot={{ r: 3, fill: "#67c5a2", stroke: "#67c5a2" }}
-              strokeDasharray='4 4'
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      {hasData ? (
+        <div className='chart-area chart-area--small'>
+          <ResponsiveContainer width='100%' height={195}>
+            <ComposedChart data={data} barGap={0} barSize={42}>
+              <CartesianGrid strokeDasharray='3 3' vertical={false} />
+              <XAxis
+                dataKey='type'
+                tick={{ fontSize: 9 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                yAxisId='left'
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                yAxisId='right'
+                orientation='right'
+                domain={[0, 100]}
+                tick={{ fontSize: 10 }}
+                tickFormatter={(value) => `${value}%`}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip />
+              <Bar yAxisId='left' dataKey='count' radius={[4, 4, 0, 0]}>
+                {data.map((item, index) => (
+                  <Cell
+                    key={item.type}
+                    fill={BAR_COLORS[index % BAR_COLORS.length]}
+                  />
+                ))}
+              </Bar>
+              <Line
+                yAxisId='right'
+                type='monotone'
+                dataKey='cumulative'
+                stroke='#67c5a2'
+                strokeWidth={2}
+                dot={{ r: 3, fill: "#67c5a2", stroke: "#67c5a2" }}
+                strokeDasharray='4 4'
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <p className='dashboard-note'>
+          {typeDistributionQuery.isLoading
+            ? t("Loading dashboard data...")
+            : t("No data available")}
+        </p>
+      )}
     </section>
   );
 };

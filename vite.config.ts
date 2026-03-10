@@ -19,7 +19,7 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-  base: "/ntww_odp_landing_page/static/dashboard",
+  base: "/",
   css: {
     devSourcemap: true,
     preprocessorOptions: {
@@ -30,10 +30,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/ntww_odp/": "https://appdev.ntww.com/",
-      "/ntww/": "https://appdev.ntww.com/",
-      "/gis/": "https://appdev.ntww.com/",
-      "/survey/": "https://appdev.ntww.com/",
+      "/api/":
+        "https://operationsdashboard-g7djhsbqfnhqbrbb.canadacentral-01.azurewebsites.net/",
     },
   },
   resolve: {

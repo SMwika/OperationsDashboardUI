@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./Dashboard.scss";
-import { useTranslation } from "react-i18next";
-import { useGetProgressStatusQuery } from "@/store/dashboard/dashboard.api.ts";
+import {
+  useGetProgressStatusQuery,
+  useGetSummaryQuery,
+} from "@/store/dashboard/dashboard.api.ts";
 import PerformanceOverview from "./components/PerformanceOverview/PerformanceOverview";
 import SummaryKpis from "./components/SummaryKpis/SummaryKpis";
 import ProgressStatus from "./components/ProgressStatus/ProgressStatus";
@@ -13,71 +15,82 @@ import DistributionEffort from "./components/DistributionEffort/DistributionEffo
 import BreakdownByStages from "./components/BreakdownByStages/BreakdownByStages";
 import AverageTime from "./components/AverageTime/AverageTime";
 import TaskDetails from "./components/TaskDetails/TaskDetails";
-
-const formatDate = (value: Date) => {
-  const year = value.getFullYear();
-  const month = `${value.getMonth() + 1}`.padStart(2, "0");
-  const day = `${value.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const getDefaultRange = () => {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  return {
-    startDate: formatDate(monthStart),
-    endDate: formatDate(now),
-  };
-};
+import { getDefaultDateRange, toDashboardApiDate } from "./utils/dateRange";
+import DateRangeFilter from "./components/DateRangeFilter/DateRangeFilter";
 
 const Dashboard = () => {
-  const [range, setRange] = useState(getDefaultRange());
-  const { t } = useTranslation();
+  const [range, setRange] = useState(getDefaultDateRange());
 
   const hasRange = !!range.startDate && !!range.endDate;
 
-  const progressQuery = useGetProgressStatusQuery(range, {
+  const apiRange = useMemo(
+    () => ({
+      startDate: toDashboardApiDate(range.startDate),
+      endDate: toDashboardApiDate(range.endDate),
+    }),
+    [range],
+  );
+
+  const progressQuery = useGetProgressStatusQuery(apiRange, {
+    skip: !hasRange,
+  });
+
+  const summaryQuery = useGetSummaryQuery(apiRange, {
     skip: !hasRange,
   });
 
   return (
     <div className='Dashboard'>
-      <SummaryKpis />
+      <div className='dashboard-toolbar'>
+        <DateRangeFilter range={range} onChange={setRange} />
+      </div>
 
-      <PerformanceOverview />
+      <SummaryKpis
+        data={summaryQuery.data?.kpis}
+        isLoading={summaryQuery.isLoading}
+      />
+
+      <PerformanceOverview
+        range={range}
+        overviewProgress={summaryQuery.data?.overviewProgress}
+        isOverviewLoading={summaryQuery.isLoading}
+      />
       <ProgressStatus
         data={progressQuery.data}
         isLoading={progressQuery.isLoading}
         isError={progressQuery.isError}
-        range={range}
-        onRangeChange={setRange}
       />
 
-      <Aging />
+      <Aging asOf={apiRange.startDate} />
 
       <div className='dashboard-grid dashboard-grid--triple'>
-        <RejectingStatus />
-        <CategoryOfPriority />
-        <TaskPerType />
+        <RejectingStatus
+          startDate={apiRange.startDate}
+          endDate={apiRange.endDate}
+        />
+        <CategoryOfPriority
+          startDate={apiRange.startDate}
+          endDate={apiRange.endDate}
+        />
+        <TaskPerType
+          startDate={apiRange.startDate}
+          endDate={apiRange.endDate}
+        />
       </div>
 
-      <DistributionEffort />
+      <DistributionEffort
+        startDate={apiRange.startDate}
+        endDate={apiRange.endDate}
+      />
 
-      <BreakdownByStages />
+      <BreakdownByStages
+        startDate={apiRange.startDate}
+        endDate={apiRange.endDate}
+      />
 
-      <AverageTime />
+      <AverageTime startDate={apiRange.startDate} endDate={apiRange.endDate} />
 
-      <TaskDetails />
-
-      {/* {progressQuery.isLoading && (
-        <p className='dashboard-note'>{t("Loading dashboard data...")}</p>
-      )}
-
-      {progressQuery.isError && (
-        <p className='dashboard-note error'>
-          {t("Some dashboard sections failed to load")}
-        </p>
-      )} */}
+      <TaskDetails startDate={apiRange.startDate} endDate={apiRange.endDate} />
     </div>
   );
 };
