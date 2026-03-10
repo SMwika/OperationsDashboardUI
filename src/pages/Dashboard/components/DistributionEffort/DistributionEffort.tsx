@@ -10,34 +10,75 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetEffortDistributionQuery } from "@/store/dashboard/dashboard.api.ts";
 import InfoCircle from "@/assets/icons/info-circle.svg";
 import "./DistributionEffort.scss";
 
-type TimeView = "monthly" | "weekly" | "hours";
+type TimeView = "monthly" | "weekly";
 
-const SAMPLE_DATA = [
-  { month: "Jan", roadmap: 5, operation: 32, adhoc: 12 },
-  { month: "Feb", roadmap: 8, operation: 21, adhoc: 39 },
-  { month: "Mar", roadmap: 11, operation: 30, adhoc: 48 },
-  { month: "Apr", roadmap: 14, operation: 70, adhoc: 56 },
-  { month: "May", roadmap: 16, operation: 33, adhoc: 66 },
-  { month: "Jun", roadmap: 38, operation: 56, adhoc: 75 },
-  { month: "Jul", roadmap: 36, operation: 50, adhoc: 67 },
-  { month: "Aug", roadmap: 43, operation: 26, adhoc: 66 },
-  { month: "Sep", roadmap: 50, operation: 14, adhoc: 80 },
-  { month: "Oct", roadmap: null, operation: null, adhoc: null },
-  { month: "Nov", roadmap: null, operation: null, adhoc: null },
-  { month: "Dec", roadmap: null, operation: null, adhoc: null },
+const LINE_COLORS = [
+  "#7f3b76",
+  "#1f4fb0",
+  "#20a278",
+  "#ef476f",
+  "#1aa6d1",
+  "#a855f7",
 ];
 
-const DistributionEffort: FC = () => {
+interface IDistributionEffortProps {
+  startDate?: string;
+  endDate?: string;
+}
+
+const formatLabel = (value: string) =>
+  value
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
+const DistributionEffort: FC<IDistributionEffortProps> = ({
+  startDate,
+  endDate,
+}) => {
   const { t } = useTranslation();
   const [timeView, setTimeView] = useState<TimeView>("monthly");
+  const [isPercent, setIsPercent] = useState(false);
   const [activeTab, setActiveTab] = useState<"distribution" | "balance">(
     "distribution",
   );
+  const [assignedTo, setAssignedTo] = useState<string>("");
 
-  const data = useMemo(() => SAMPLE_DATA, []);
+  const granularity =
+    timeView === "monthly" ? "month" : timeView === "weekly" ? "week" : "day";
+  const asPercent = isPercent;
+
+  const effortQuery = useGetEffortDistributionQuery(
+    {
+      startDate: startDate || "",
+      endDate: endDate || "",
+      granularity,
+      asPercent,
+      assignedTo,
+    },
+    {
+      skip: !startDate || !endDate,
+    },
+  );
+
+  const categories = effortQuery.data?.categories || [];
+
+  const data = useMemo(
+    () =>
+      (effortQuery.data?.series || []).map((item) => ({
+        period: item.period,
+        ...item.values,
+      })),
+    [effortQuery.data],
+  );
+
+  const hasData = data.length > 0 && categories.length > 0;
 
   return (
     <section className='dashboard-card chart-card distribution-effort'>
@@ -50,13 +91,14 @@ const DistributionEffort: FC = () => {
         <div className='distribution-effort__controls'>
           <label>{t("Employee")}</label>
           <select
-            defaultValue='Abdullah Faisal'
+            value={assignedTo}
+            onChange={(event) => setAssignedTo(event.target.value)}
             aria-label={t("Employee select")}>
-            <option>Abdullah Faisal</option>
+            <option value=''>{t("All")}</option>
           </select>
 
           <div className='distribution-effort__time'>
-            {(["monthly", "weekly", "hours"] as const).map((item) => (
+            {(["monthly", "weekly"] as const).map((item) => (
               <button
                 key={item}
                 type='button'
@@ -67,7 +109,22 @@ const DistributionEffort: FC = () => {
             ))}
           </div>
 
-          <div className='distribution-effort__tabs'>
+          <div className='distribution-effort__percent'>
+            <span className='distribution-effort__percent-label'>
+              {t("Percent")}
+            </span>
+            <label className='distribution-effort__switch'>
+              <input
+                type='checkbox'
+                checked={isPercent}
+                onChange={() => setIsPercent((prev) => !prev)}
+                aria-label={t("Toggle percent")}
+              />
+              <span className='distribution-effort__slider' />
+            </label>
+          </div>
+
+          {/* <div className='distribution-effort__tabs'>
             <button
               type='button'
               className={activeTab === "distribution" ? "active" : ""}
@@ -80,73 +137,76 @@ const DistributionEffort: FC = () => {
               onClick={() => setActiveTab("balance")}>
               {t("Weekly Balance")}
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 
       <div className='chart-area'>
-        <ResponsiveContainer width='100%' height={220}>
-          <LineChart
-            data={data}
-            margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray='4 4' vertical={false} />
-            <XAxis
-              dataKey='month'
-              tick={{ fontSize: 10 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 10 }}
-              tickFormatter={(value) => `${value}%`}
-              domain={[0, 100]}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              formatter={(value, name) => [`${value}%`, t(String(name))]}
-              contentStyle={{
-                background: "#111827",
-                border: "none",
-                borderRadius: 6,
-                color: "#fff",
-              }}
-            />
-            <Legend
-              iconType='circle'
-              iconSize={7}
-              verticalAlign='top'
-              align='right'
-            />
-            <Line
-              type='monotone'
-              dataKey='roadmap'
-              name={t("Roadmap")}
-              stroke='#7f3b76'
-              strokeWidth={2.5}
-              dot={{ r: 3, fill: "#7f3b76", stroke: "#7f3b76" }}
-              connectNulls={false}
-            />
-            <Line
-              type='monotone'
-              dataKey='operation'
-              name={t("Operation")}
-              stroke='#1f4fb0'
-              strokeWidth={2.5}
-              dot={{ r: 3, fill: "#1f4fb0", stroke: "#1f4fb0" }}
-              connectNulls={false}
-            />
-            <Line
-              type='monotone'
-              dataKey='adhoc'
-              name={t("Ad hoc")}
-              stroke='#20a278'
-              strokeWidth={2.5}
-              dot={{ r: 3, fill: "#20a278", stroke: "#20a278" }}
-              connectNulls={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {hasData ? (
+          <ResponsiveContainer width='100%' height={220}>
+            <LineChart
+              data={data}
+              margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray='4 4' vertical={false} />
+              <XAxis
+                dataKey='period'
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10 }}
+                tickFormatter={(value) =>
+                  asPercent ? `${Number(value).toFixed(0)}%` : `${value}`
+                }
+                domain={asPercent ? [0, 100] : ["auto", "auto"]}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                formatter={(value, name) => [
+                  asPercent ? `${value}%` : value,
+                  t(formatLabel(String(name))),
+                ]}
+                contentStyle={{
+                  background: "#111827",
+                  border: "none",
+                  borderRadius: 6,
+                  color: "#fff",
+                }}
+              />
+              <Legend
+                iconType='circle'
+                iconSize={7}
+                verticalAlign='top'
+                align='right'
+                formatter={(value) => t(formatLabel(String(value)))}
+              />
+              {categories.map((category, index) => (
+                <Line
+                  key={category}
+                  type='monotone'
+                  dataKey={category}
+                  name={category}
+                  stroke={LINE_COLORS[index % LINE_COLORS.length]}
+                  strokeWidth={2.5}
+                  dot={{
+                    r: 3,
+                    fill: LINE_COLORS[index % LINE_COLORS.length],
+                    stroke: LINE_COLORS[index % LINE_COLORS.length],
+                  }}
+                  connectNulls={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className='dashboard-note'>
+            {effortQuery.isLoading
+              ? t("Loading dashboard data...")
+              : t("No data available")}
+          </p>
+        )}
       </div>
     </section>
   );

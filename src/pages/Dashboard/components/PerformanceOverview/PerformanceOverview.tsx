@@ -16,6 +16,11 @@ import "./PerformanceOverview.scss";
 import { SYS_TYPES } from "@/constants";
 import InfoCircle from "@/assets/icons/info-circle.svg";
 import { useTranslation } from "react-i18next";
+import {
+  IOverviewProgress,
+  useGetTrendsQuery,
+} from "@/store/dashboard/dashboard.api.ts";
+import { IDateRange, toDashboardApiDate } from "../../utils/dateRange";
 
 ChartJS.register(
   ArcElement,
@@ -34,122 +39,47 @@ const gaugeRanges = [
   { label: "90-100%", tone: "green" },
 ];
 
-const monthlyTrend = [
-  {
-    label: "Jan",
-    dateLabel: "Jan 26, 2023",
-    actual: 0,
-    forecast: null,
-    plan: 0,
-  },
-  {
-    label: "Feb",
-    dateLabel: "Feb 26, 2023",
-    actual: 120,
-    forecast: null,
-    plan: 520,
-  },
-  {
-    label: "Mar",
-    dateLabel: "Mar 26, 2023",
-    actual: 460,
-    forecast: null,
-    plan: 640,
-  },
-  {
-    label: "Apr",
-    dateLabel: "Apr 26, 2023",
-    actual: 560,
-    forecast: 640,
-    plan: 730,
-  },
-  {
-    label: "May",
-    dateLabel: "May 26, 2023",
-    actual: 781,
-    forecast: 820,
-    plan: 810,
-  },
-  {
-    label: "Jun",
-    dateLabel: "Jun 26, 2023",
-    actual: null,
-    forecast: null,
-    plan: 900,
-  },
-  {
-    label: "Jul",
-    dateLabel: "Jul 26, 2023",
-    actual: null,
-    forecast: null,
-    plan: 1200,
-  },
-];
+interface IPerformanceOverviewProps {
+  range?: IDateRange;
+  overviewProgress?: IOverviewProgress;
+  isOverviewLoading?: boolean;
+}
 
-const weeklyTrend = [
-  {
-    label: "Jan",
-    dateLabel: "Jan 26, 2023",
-    actual: 0,
-    forecast: null,
-    plan: 0,
-  },
-  {
-    label: "Feb",
-    dateLabel: "Feb 26, 2023",
-    actual: 80,
-    forecast: null,
-    plan: 300,
-  },
-  {
-    label: "Mar",
-    dateLabel: "Mar 26, 2023",
-    actual: 240,
-    forecast: null,
-    plan: 420,
-  },
-  {
-    label: "Apr",
-    dateLabel: "Apr 26, 2023",
-    actual: 310,
-    forecast: 420,
-    plan: 480,
-  },
-  {
-    label: "May",
-    dateLabel: "May 26, 2023",
-    actual: 430,
-    forecast: 500,
-    plan: 560,
-  },
-  {
-    label: "Jun",
-    dateLabel: "Jun 26, 2023",
-    actual: null,
-    forecast: null,
-    plan: 620,
-  },
-  {
-    label: "Jul",
-    dateLabel: "Jul 26, 2023",
-    actual: null,
-    forecast: null,
-    plan: 780,
-  },
-];
-
-const progressSummary = [
-  { label: "Weekly progress", value: 90, tone: "green" },
-  { label: "Monthly progress", value: 78, tone: "orange" },
-  { label: "Yearly progress", value: 61, tone: "amber" },
-];
-
-const PerformanceOverview: FC = () => {
+const PerformanceOverview: FC<IPerformanceOverviewProps> = ({
+  range,
+  overviewProgress,
+  isOverviewLoading,
+}) => {
   const [isWeekly, setIsWeekly] = useState(false);
   const [isCumulative, setIsCumulative] = useState(false);
-  const overallProgress = 78;
-  const remainder = Math.max(0, 100 - overallProgress);
   const { t } = useTranslation();
+  const hasOverviewData = !!overviewProgress;
+  const overallProgress = overviewProgress?.donut?.percent || 0;
+  const remainder = Math.max(0, 100 - overallProgress);
+
+  const progressSummary = useMemo(
+    () =>
+      hasOverviewData
+        ? [
+            {
+              label: t("Weekly progress"),
+              value: overviewProgress.weekly.percent,
+              tone: "green",
+            },
+            {
+              label: t("Monthly progress"),
+              value: overviewProgress.monthly.percent,
+              tone: "orange",
+            },
+            {
+              label: t("Yearly progress"),
+              value: overviewProgress.yearly.percent,
+              tone: "amber",
+            },
+          ]
+        : [],
+    [hasOverviewData, overviewProgress, t],
+  );
 
   const gaugeData = useMemo(
     () => ({
@@ -211,7 +141,7 @@ const PerformanceOverview: FC = () => {
         ctx.fillStyle = "#1f2937";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(`${overallProgress.toFixed(1)}%`, x, y - 6);
+        ctx.fillText(String(overviewProgress?.donut?.value) || "0", x, y - 6);
         ctx.font = "400 12px 'IBMPlexSans', 'SomarRegular', sans-serif";
         ctx.fillStyle = "#6b7280";
         // ctx.fillText("Overall progress", x, y + 18);
@@ -225,7 +155,7 @@ const PerformanceOverview: FC = () => {
         ctx.textBaseline = "top";
 
         const bottomY = y + 10;
-        ctx.fillText("0%", chartArea.left + 15, bottomY);
+        ctx.fillText("0", chartArea.left + 15, bottomY);
         ctx.restore();
 
         // Right end label (100.0%)
@@ -234,11 +164,15 @@ const PerformanceOverview: FC = () => {
         ctx.fillStyle = "#6b7280";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        ctx.fillText("100%", chartArea.right - 15, bottomY);
+        ctx.fillText(
+          String(overviewProgress?.donut?.total) || "0",
+          chartArea.right - 15,
+          bottomY,
+        );
         ctx.restore();
       },
     }),
-    [overallProgress],
+    [overallProgress, overviewProgress?.donut],
   );
 
   const dottedGridPlugin = useMemo(
@@ -270,32 +204,31 @@ const PerformanceOverview: FC = () => {
     [],
   );
 
-  const baseSeries = isWeekly ? weeklyTrend : monthlyTrend;
+  const trendParams = useMemo(
+    () => ({
+      startDate: toDashboardApiDate(range?.startDate || ""),
+      endDate: toDashboardApiDate(range?.endDate || ""),
+      interval: (isWeekly ? "week" : "month") as "week" | "month",
+      cumulative: isCumulative,
+    }),
+    [isCumulative, isWeekly, range],
+  );
+
+  const hasRange = !!range?.startDate && !!range?.endDate;
+  const trendsQuery = useGetTrendsQuery(trendParams, {
+    skip: !hasRange,
+  });
+  const hasTrendData = !!trendsQuery.data?.points?.length;
 
   const series = useMemo(() => {
-    if (!isCumulative) {
-      return baseSeries;
-    }
-
-    let actualAcc = 0;
-    let forecastAcc = 0;
-    let planAcc = 0;
-
-    return baseSeries.map((item) => {
-      const actualValue =
-        item.actual == null ? null : (actualAcc += item.actual);
-      const forecastValue =
-        item.forecast == null ? null : (forecastAcc += item.forecast);
-      const planValue = item.plan == null ? null : (planAcc += item.plan);
-
-      return {
-        ...item,
-        actual: actualValue,
-        forecast: forecastValue,
-        plan: planValue,
-      };
-    });
-  }, [baseSeries, isCumulative]);
+    return (trendsQuery.data?.points || []).map((point) => ({
+      label: point.period,
+      dateLabel: point.dateLabel,
+      actual: point.actual,
+      forecast: point.forecast,
+      plan: point.plan,
+    }));
+  }, [trendsQuery.data]);
 
   const lineData = useMemo(
     () => ({
@@ -434,36 +367,52 @@ const PerformanceOverview: FC = () => {
           </div>
         </div>
         <div className='gauge'>
-          <div className='gauge__chart' aria-label='Overall progress gauge'>
-            <Doughnut
-              data={gaugeData}
-              options={gaugeOptions}
-              plugins={[centerTextPlugin]}
-            />
-          </div>
-          <div className='gauge__meta'>
-            <div className='legend'>
-              {gaugeRanges.map((range) => (
-                <div className='legend__item' key={range.label}>
-                  <span className={`legend__dot legend__dot--${range.tone}`} />
-                  <span className='legend__label'>{range.label}</span>
+          {hasOverviewData ? (
+            <>
+              <div className='gauge__chart' aria-label='Overall progress gauge'>
+                <Doughnut
+                  data={gaugeData}
+                  options={gaugeOptions}
+                  plugins={[centerTextPlugin]}
+                />
+              </div>
+              <div className='gauge__meta'>
+                <div className='legend'>
+                  {gaugeRanges.map((range) => (
+                    <div className='legend__item' key={range.label}>
+                      <span
+                        className={`legend__dot legend__dot--${range.tone}`}
+                      />
+                      <span className='legend__label'>{range.label}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className='progress-list'>
-              {progressSummary.map((item) => (
-                <div className='progress-list__item' key={item.label}>
-                  <div
-                    className={`progress-list__bar progress-list__bar--${item.tone}`}
-                  />
-                  <div className='progress-list__content'>
-                    <span className='progress-list__value'>{item.value}%</span>
-                    <span className='progress-list__label'>{item.label}</span>
-                  </div>
+                <div className='progress-list'>
+                  {progressSummary.map((item) => (
+                    <div className='progress-list__item' key={item.label}>
+                      <div
+                        className={`progress-list__bar progress-list__bar--${item.tone}`}
+                      />
+                      <div className='progress-list__content'>
+                        <span className='progress-list__value'>
+                          {item.value}%
+                        </span>
+                        <span className='progress-list__label'>
+                          {item.label}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </>
+          ) : (
+            <p className='dashboard-note'>
+              {isOverviewLoading
+                ? t("Loading dashboard data...")
+                : t("No data available")}
+            </p>
+          )}
         </div>
       </div>
 
@@ -507,12 +456,20 @@ const PerformanceOverview: FC = () => {
           </div>
         </div>
         <div className='trend-chart'>
-          <Line
-            data={lineData}
-            options={lineOptions}
-            plugins={[dottedGridPlugin]}
-            height={260}
-          />
+          {hasTrendData ? (
+            <Line
+              data={lineData}
+              options={lineOptions}
+              plugins={[dottedGridPlugin]}
+              height={260}
+            />
+          ) : (
+            <p className='dashboard-note'>
+              {trendsQuery.isLoading
+                ? t("Loading dashboard data...")
+                : t("No data available")}
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -33,4 +33,4 @@ export const PROGRESS_COLORS = {
   red: "#f32641",
 };
 
-export const PATH = "/ntww_odp_landing_page/static/dashboard";
+export const PATH = "/";

@@ -9,6 +9,8 @@ import { Inspector } from "react-dev-inspector";
 import i18next from "i18next";
 import ar from "./translations/ar-SA.json";
 import en from "./translations/en-GB.json";
+import { MsalProvider } from "@azure/msal-react";
+import { msalInstance } from "@/auth/msal";
 
 i18next.init({
   interpolation: { escapeValue: false },
@@ -25,6 +27,7 @@ i18next.init({
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
+    {/* <MsalProvider instance={msalInstance}> */}
     <BrowserRouter basename={import.meta.env.DEV ? PATH : ""}>
       <I18nextProvider i18n={i18next}>
         <Inspector>
@@ -32,5 +35,6 @@ createRoot(document.getElementById("root")!).render(
         </Inspector>
       </I18nextProvider>
     </BrowserRouter>
+    {/* </MsalProvider> */}
   </Provider>,
 );

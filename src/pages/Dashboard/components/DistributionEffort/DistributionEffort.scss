@@ -73,6 +73,64 @@
     }
   }
 
+  &__percent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__percent-label {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  &__switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  &__slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: 0.3s;
+    border-radius: 999px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+    }
+  }
+
+  &__switch input:checked + .distribution-effort__slider {
+    background-color: #1f8682;
+  }
+
+  &__switch input:checked + .distribution-effort__slider:before {
+    transform: translateX(20px);
+  }
+
   .recharts-default-legend {
     margin-top: 2px !important;
   }

@@ -1,8 +1,8 @@
 import AddIcon from "@/assets/icons/add.svg";
 import SystemIcon from "@/assets/icons/system.svg";
 import GroupRowsIcon from "@/assets/icons/group-rows.svg";
-import SearchIcon from '@/assets/icons/table/search.svg';
-import CloseIcon from '@/assets/icons/table/close.svg';
+import SearchIcon from "@/assets/icons/table/search.svg";
+import CloseIcon from "@/assets/icons/table/close.svg";
 import ProjectIcon from "@/assets/icons/confirmation.svg";
 import SitesIcon from "@/assets/icons/sites.svg";
 import PasteIcon from "@/assets/icons/paste.svg";
@@ -18,6 +18,12 @@ import PendingIcon from "@/assets/icons/pending.svg";
 import ArrowLeftIcon from "@/assets/icons/arrow-left.svg";
 import ExternalIcon from "@/assets/icons/external.svg";
 import FilterIcon from "@/assets/icons/filter2.svg";
+import BudgetIcon from "@/assets/icons/budget.svg";
+import DollarIcon from "@/assets/icons/dollar.svg";
+import MeasureIcon from "@/assets/icons/measure.svg";
+import StackIcon from "@/assets/icons/stack.svg";
+import PurchasingOrderIcon from "@/assets/icons/purchasing-order.svg";
+import OrderIcon from "@/assets/icons/order.svg";
 
 export {
   AddIcon,
@@ -39,5 +45,11 @@ export {
   PendingIcon,
   ArrowLeftIcon,
   ExternalIcon,
-  FilterIcon
-}
+  FilterIcon,
+  BudgetIcon,
+  DollarIcon,
+  MeasureIcon,
+  StackIcon,
+  PurchasingOrderIcon,
+  OrderIcon,
+};
