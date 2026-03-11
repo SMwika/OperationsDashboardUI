@@ -1,4 +1,5 @@
 name: Azure Static Web Apps CI/CD
+
 on:
   push:
     branches:
@@ -13,6 +14,7 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -25,20 +27,36 @@ jobs:
         with:
           node-version: '22'
 
-      # Install dependencies with --legacy-peer-deps to bypass the
+      # Install dependencies with --legacy-peer-deps to bypass
       # react-debounce-input@3.3.0 peer dependency conflict with React 19
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      # Build the app on the runner — produces the /dist folder
+      # Build the app — Vite compiles everything into /dist
+      # dist/index.html will reference hashed /assets/main-xxxx.js (not main.tsx)
       - name: Build App
         run: npm run build
-        
 
-      # Delete node_modules BEFORE the deploy step.
-      # Azure SWA uploads the entire workspace, not just /dist.
-      # node_modules alone can exceed the 250MB free plan limit,
-      # causing a BadRequest error. Only /dist needs to be deployed.
+      # DEBUG: Verify dist output is correct before deploying.
+      # Confirms index.html references compiled assets, not raw .tsx source files.
+      # Remove this block once deployment is confirmed working.
+      - name: Debug - Verify dist output
+        run: |
+          echo "=== dist/ root ==="
+          ls -la dist/
+          echo ""
+          echo "=== dist/assets/ ==="
+          ls -la dist/assets/ || echo "WARNING: No assets folder found!"
+          echo ""
+          echo "=== dist/index.html ==="
+          cat dist/index.html
+          echo ""
+          echo "=== staticwebapp.config.json in dist ==="
+          cat dist/staticwebapp.config.json || echo "WARNING: staticwebapp.config.json not found in dist!"
+
+      # node_modules must be removed BEFORE deploy.
+      # Azure SWA uploads the entire workspace — keeping node_modules
+      # pushes the upload over the 250MB free plan limit (BadRequest error).
       - name: Remove node_modules
         run: rm -rf node_modules
 
@@ -49,11 +67,15 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist" # Built app content directory - optional
-          # Oryx build is skipped since we already built the app above.
-          # Azure will only pick up and deploy the pre-built /dist folder.
+          # app_location is repo root where index.html lives
+          app_location: "/"
+          api_location: ""
+          # output_location is where Vite puts the compiled build
+          output_location: "dist"
+          # skip_app_build: true — tells Oryx NOT to run its own npm install.
+          # We already built the app above; Oryx should only deploy /dist as-is.
+          # Without this, Oryx runs a fresh npm install and fails on the
+          # react-debounce-input peer dependency conflict with React 19.
           skip_app_build: true
 
   close_pull_request_job:
@@ -67,5 +89,3 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           action: "close"
-
-
