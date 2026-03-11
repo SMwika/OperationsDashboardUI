@@ -33,14 +33,6 @@ jobs:
       # Build the app on the runner — produces the /dist folder
       - name: Build App
         run: npm run build
-
-       # Copy the SWA config into dist so Azure picks it up during deployment.
-      # This config tells Azure to serve index.html for all unknown routes,
-      # which is required for React SPA client-side routing to work correctly.
-      # Without this, navigating to any route other than '/' returns a blank page.
-      - name: Copy SWA config to dist
-        run: cp staticwebapp.config.json dist/staticwebapp.config.json
-
         
 
       # Delete node_modules BEFORE the deploy step.
@@ -75,4 +67,5 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           action: "close"
+
 
