@@ -19,20 +19,27 @@ jobs:
           submodules: true
           lfs: false
 
-      # Step 1: Install Node 22 explicitly on the runner
+      # Install Node 22 on the runner to match project requirements
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22'
 
-      # Step 2: Install dependencies with --legacy-peer-deps to bypass the
-      # react-debounce-input@3.3.0 peer dependency conflict with React 19.
+      # Install dependencies with --legacy-peer-deps to bypass the
+      # react-debounce-input@3.3.0 peer dependency conflict with React 19
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      # Step 3: Build the app on the runner (produces the /dist folder)
+      # Build the app on the runner — produces the /dist folder
       - name: Build App
         run: npm run build
+
+      # Delete node_modules BEFORE the deploy step.
+      # Azure SWA uploads the entire workspace, not just /dist.
+      # node_modules alone can exceed the 250MB free plan limit,
+      # causing a BadRequest error. Only /dist needs to be deployed.
+      - name: Remove node_modules
+        run: rm -rf node_modules
 
       - name: Build And Deploy
         id: builddeploy
@@ -44,9 +51,8 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
-          # skip_app_build: true tells Oryx NOT to run its own npm install + build.
-          # Since we already built the app in the steps above, Oryx only needs
-          # to pick up the compiled output from the 'dist' folder and deploy it.
+          # Oryx build is skipped since we already built the app above.
+          # Azure will only pick up and deploy the pre-built /dist folder.
           skip_app_build: true
 
   close_pull_request_job:
