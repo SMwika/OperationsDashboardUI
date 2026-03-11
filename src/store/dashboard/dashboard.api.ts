@@ -166,7 +166,7 @@ interface ITrendsParams extends IRangeParams {
 export const dashboardApi = createApi({
   reducerPath: "dashboard/api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "/api/Dashboard",
+    baseUrl: "https://operationsdashboard-g7djhsbqfnhqbrbb.canadacentral-01.azurewebsites.net/api/Dashboard",
     prepareHeaders: (headers) => {
       const token = getPersistedAccessToken();
       if (token) {
