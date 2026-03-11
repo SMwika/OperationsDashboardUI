@@ -32,13 +32,14 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      # Vite compiles src/main.tsx → dist/assets/main-xxxx.js
-      # and rewrites dist/index.html to reference the hashed asset
+      # Vite compiles src/main.tsx → dist/assets/index-xxxx.js
+      # and rewrites dist/index.html to reference the hashed compiled asset
       - name: Build App
         run: npm run build
 
       # DEBUG: Confirm dist/index.html references compiled /assets/*.js
-      # and that staticwebapp.config.json was copied from /public to /dist
+      # and that staticwebapp.config.json was copied from /public to /dist by Vite
+      # Remove this step once deployment is confirmed working
       - name: Debug - Verify dist output
         run: |
           echo "=== dist/ root ==="
@@ -65,14 +66,22 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-         app_location: "dist" 
+          # app_location points to dist/ — the pre-built compiled output.
+          # Previously "/" caused Azure to serve the repo root index.html
+          # which still references /src/main.tsx, triggering the MIME type error.
+          app_location: "dist"
           api_location: ""
-         
+          # output_location is empty because dist is already the final output.
+          # Setting this to "dist" when app_location is also "dist" would cause
+          # Azure to look for dist/dist which does not exist.
+          output_location: ""
           # app_artifact_location explicitly tells Azure to serve ONLY from dist/.
           # Without this, when skip_app_build is true, Azure may fall back to
-          # serving raw source files from the repo root — causing the MIME type
-          # error because it serves main.tsx instead of the compiled main-xxxx.js
+          # serving raw source files from the repo root.
           app_artifact_location: "dist"
+          # skip_app_build: true tells Oryx NOT to run its own npm install + build.
+          # We already built the app above. Without this flag, Oryx runs a fresh
+          # npm install and fails on the react-debounce-input peer dep conflict.
           skip_app_build: true
 
   close_pull_request_job:
@@ -86,4 +95,3 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           action: "close"
-
