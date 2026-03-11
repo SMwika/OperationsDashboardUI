@@ -27,19 +27,18 @@ jobs:
         with:
           node-version: '22'
 
-      # Install dependencies with --legacy-peer-deps to bypass
-      # react-debounce-input@3.3.0 peer dependency conflict with React 19
+      # Install with --legacy-peer-deps to bypass react-debounce-input@3.3.0
+      # peer dependency conflict with React 19
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      # Build the app — Vite compiles everything into /dist
-      # dist/index.html will reference hashed /assets/main-xxxx.js (not main.tsx)
+      # Vite compiles src/main.tsx → dist/assets/main-xxxx.js
+      # and rewrites dist/index.html to reference the hashed asset
       - name: Build App
         run: npm run build
 
-      # DEBUG: Verify dist output is correct before deploying.
-      # Confirms index.html references compiled assets, not raw .tsx source files.
-      # Remove this block once deployment is confirmed working.
+      # DEBUG: Confirm dist/index.html references compiled /assets/*.js
+      # and that staticwebapp.config.json was copied from /public to /dist
       - name: Debug - Verify dist output
         run: |
           echo "=== dist/ root ==="
@@ -54,9 +53,8 @@ jobs:
           echo "=== staticwebapp.config.json in dist ==="
           cat dist/staticwebapp.config.json || echo "WARNING: staticwebapp.config.json not found in dist!"
 
-      # node_modules must be removed BEFORE deploy.
-      # Azure SWA uploads the entire workspace — keeping node_modules
-      # pushes the upload over the 250MB free plan limit (BadRequest error).
+      # Remove node_modules before deploy — Azure uploads the full workspace
+      # and node_modules alone exceeds the 250MB free plan limit
       - name: Remove node_modules
         run: rm -rf node_modules
 
@@ -67,15 +65,14 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_MEADOW_041831A10 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          # app_location is repo root where index.html lives
           app_location: "/"
           api_location: ""
-          # output_location is where Vite puts the compiled build
           output_location: "dist"
-          # skip_app_build: true — tells Oryx NOT to run its own npm install.
-          # We already built the app above; Oryx should only deploy /dist as-is.
-          # Without this, Oryx runs a fresh npm install and fails on the
-          # react-debounce-input peer dependency conflict with React 19.
+          # app_artifact_location explicitly tells Azure to serve ONLY from dist/.
+          # Without this, when skip_app_build is true, Azure may fall back to
+          # serving raw source files from the repo root — causing the MIME type
+          # error because it serves main.tsx instead of the compiled main-xxxx.js
+          app_artifact_location: "dist"
           skip_app_build: true
 
   close_pull_request_job:
