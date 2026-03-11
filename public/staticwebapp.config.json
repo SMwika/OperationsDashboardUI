@@ -7,7 +7,7 @@
     ".tsx": "application/javascript",
     ".css": "text/css",
     ".json": "application/json",
-    ".wasm": "application/wasm"
+    ".wasm": "application/wasm"     
   },
   "navigationFallback": {
     "rewrite": "/index.html",
